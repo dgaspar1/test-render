@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Polaridade por Autor</title>
+</head>
+<body>
+
+<h1>Autores</h1>
+<label for="authors">Selecione um autor:</label>
+<select id="authors" multiple>
+    <option value="">Todos</option>
+</select>
+
+<h1>Tópicos</h1>
+<label for="tags">Selecione um tópico:</label>
+<select id="tags">
+    <option value="">Todos</option>
+</select>
+<br>
+<button onclick="getTweetsByAuthors()">Filtrar por Autores</button>
+
+<h1>Lista de Tweets</h1>
+
+<table id="tweetsTable">
+    <tr>
+        <th>ID</th>
+        <th>Texto</th>
+        <th>Autor</th>
+        <th>Lemas</th>
+        <th>Polaridade</th>
+        <th>Criado em</th>
+    </tr>
+</table>
+<script>
+    function fillTable(tweets) {
+        const tabela = document.getElementById('tweetsTable')
+
+        tweets.forEach((tweet, index) => {
+            const row = tabela.insertRow(index + 1)
+            const idCell = row.insertCell(0)
+            const textCell = row.insertCell(1)
+            const authorCell = row.insertCell(2)
+            const lemasCell = row.insertCell(3)
+            const polarityCell = row.insertCell(4)
+            const createatCell = row.insertCell(5)
+
+            idCell.textContent = tweet.id
+            textCell.textContent = tweet.text
+            authorCell.textContent = tweet.author
+            lemasCell.textContent = tweet.lemas
+            polarityCell.textContent = tweet.polarity
+            createatCell.textContent = tweet.createdat
+        })
+    }
+
+    function fillAuthors(authors) {
+        const selectAutores = document.getElementById('authors')
+
+        authors.forEach((author, index) => {
+            const option = document.createElement('option')
+            option.value = author.author
+            option.textContent = author.author
+            selectAutores.appendChild(option)
+        })
+    }
+
+    function fillTags(tags) {
+        const selectTags = document.getElementById('tags')
+
+        tags.forEach((tag, index) => {
+            const option = document.createElement('option')
+            option.value = tag.tags
+            option.textContent = tag.tags
+            selectTags.appendChild(option)
+        })
+    }
+
+    function getTweetsByAuthors(){
+        const selectedAuthors = [...document.getElementById('authors').selectedOptions].map(option => option.value)
+
+        fetch('/getTweetsByAuthors?authors=' + selectedAuthors.join(','))
+            .then(response => response.json())
+            .then(data => fillTable(data))
+            .catch(error => console.error('Erro ao buscar tweets por autores:', error))
+    }
+
+fetch('/getTweets')
+    .then(response => response.json())
+    .then(data => fillTable(data))
+    .catch(error => console.error('Error: ', error))
+
+fetch('/getAuthors')
+    .then(response => response.json())
+    .then(data => fillAuthors(data))
+    .catch(error => console.error('Error: ', error))
+
+fetch('/getTags')
+    .then(response => response.json())
+    .then(data => fillTags(data))
+    .catch(error => console.error('Error: ', error))
+</script>
+</body>
+</html>

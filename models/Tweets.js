@@ -1,5 +1,6 @@
-import Sequelize from 'sequelize';
+import Sequelize from 'sequelize'
 import sequelize from '../db/db.js'
+import DataTypes from 'sequelize'
 
 const Tweets = sequelize.define('tweets', {
         text: {
@@ -13,6 +14,9 @@ const Tweets = sequelize.define('tweets', {
         },
         polarity: {
             type: Sequelize.FLOAT
+        },
+        createdat: {
+            type: DataTypes.DATE, 
         }    
     },
     {
