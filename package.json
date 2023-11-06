@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "name": "test-render",
+  "version": "1.0.0",
+  "description": "Test Render",
+  "main": "app.js",
+  "author": "Denys Gaspar",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "npm": "^10.1.0",
+    "sequelize": "^6.34.0"
+  }
+}
