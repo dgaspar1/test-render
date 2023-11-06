@@ -1,9 +1,9 @@
 import express from 'express'
 import Tweets from './models/Tweets.js'
-import env from './configs/env';
+import env from './configs/env.js';
 
 const app = express();
-const port = env.PORT || 8080;
+const port = env.port || 8080;
 
 app.get('/', async (req, res)=>{
     res.status(200).json({status: 'success'})
