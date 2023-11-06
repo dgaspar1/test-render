@@ -1,9 +1,9 @@
 import express from 'express'
 import Tweets from './models/Tweets.js'
-import env from './configs/env.js';
+import env from './configs/env.js'
 
 const app = express();
-const port = env.port || 8080;
+const port = env.port || 8080
 
 app.get('/', async (req, res)=>{
     res.status(200).json({status: 'success'})
@@ -12,13 +12,13 @@ app.get('/', async (req, res)=>{
 app.get('/getTweets', async (req, res) => {
   try {
     const tweets = await Tweets.findAll();
-    res.json(tweets);
+    res.json(tweets)
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Erro ao obter os tweets.' });
+    res.status(500).json({ message: 'Erro ao obter os tweets.' })
   }
-});
+})
 
 app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-});
+  console.log(`Servidor rodando na porta ${port}`)
+})

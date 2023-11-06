@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-dotenv.config();
+dotenv.config()
 
 const env = {
     pgUrl: process.env.PGURL,
