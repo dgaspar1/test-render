@@ -3,60 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <title>Polaridade por Autor</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            margin: 20px;
+        }
+
+        h1 {
+            color: #00897b;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            color: #00897b;
+        }
+
+        select,
+        button {
+            margin-top: 10px;
+            background-color: #00897b;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        select {
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #00796b;
+        }
+
+        #chart_div {
+            margin-top: 20px;
+        }
+
+        #authors-section {
+            display: none;
+        }
+
+        #authors-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #authors-list li {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        #generate-graph-btn {
+            display: none;
+        }
+    </style>
 </head>
-<body>
+<div class="container">
+    <h1>Tópicos</h1>
+    <label for="tags">Selecione um tópico:</label>
+    <select id="tags">
+        <option value="">Todos</option>
+    </select>
+    <br>
+    <button class="waves-effect waves-light btn" onclick="showAuthorsSection()">Filtrar Autores por Tópico</button>
+    <div id="authors-section">
+        <h1>Autores</h1>
+        <div id="authors-list">
+            <select id="authors">
+                <option value="">Selecione um autor.</option>
+            </select>
+        </div>
+        <button id="generate-graph-btn" class="waves-effect waves-light btn" onclick="generateGraph()">Gerar Gráfico</button>
+        <div id="chart_div" style="width: 100%; height: 400px;"></div>
+    </div>
+    <br>
+    <button id="clear-btn" class="waves-effect waves-light btn" onclick="clearPage()">Limpar</button>
+</div>
 
-<h1>Autores</h1>
-<label for="authors">Selecione um autor:</label>
-<select id="authors" multiple>
-    <option value="">Todos</option>
-</select>
-
-<h1>Tópicos</h1>
-<label for="tags">Selecione um tópico:</label>
-<select id="tags">
-    <option value="">Todos</option>
-</select>
-<br>
-<button onclick="getTweetsByAuthors()">Filtrar por Autores</button>
-
-<h1>Lista de Tweets</h1>
-
-<table id="tweetsTable">
-    <tr>
-        <th>ID</th>
-        <th>Texto</th>
-        <th>Autor</th>
-        <th>Lemas</th>
-        <th>Polaridade</th>
-        <th>Criado em</th>
-    </tr>
-</table>
 <script>
-    function fillTable(tweets) {
-        const tabela = document.getElementById('tweetsTable')
+    
+    function showAuthorsSection() {
+        const authorsSection = document.getElementById('authors-section');
+        const generateGraphBtn = document.getElementById('generate-graph-btn');
 
-        tweets.forEach((tweet, index) => {
-            const row = tabela.insertRow(index + 1)
-            const idCell = row.insertCell(0)
-            const textCell = row.insertCell(1)
-            const authorCell = row.insertCell(2)
-            const lemasCell = row.insertCell(3)
-            const polarityCell = row.insertCell(4)
-            const createatCell = row.insertCell(5)
-
-            idCell.textContent = tweet.id
-            textCell.textContent = tweet.text
-            authorCell.textContent = tweet.author
-            lemasCell.textContent = tweet.lemas
-            polarityCell.textContent = tweet.polarity
-            createatCell.textContent = tweet.createdat
-        })
+        authorsSection.style.display = 'block';
+        generateGraphBtn.style.display = 'block';
     }
 
     function fillAuthors(authors) {
         const selectAutores = document.getElementById('authors')
-
+        selectAutores.innerHTML = ''
         authors.forEach((author, index) => {
             const option = document.createElement('option')
             option.value = author.author
@@ -76,29 +121,77 @@
         })
     }
 
-    function getTweetsByAuthors(){
-        const selectedAuthors = [...document.getElementById('authors').selectedOptions].map(option => option.value)
+    function getAuthorsByTag(){
+        const selectedTag = document.getElementById('tags').value
 
-        fetch('/getTweetsByAuthors?authors=' + selectedAuthors.join(','))
-            .then(response => response.json())
-            .then(data => fillTable(data))
-            .catch(error => console.error('Erro ao buscar tweets por autores:', error))
+        fetch('/getAuthorsByTag?tag=' + selectedTag)
+        .then(response => response.json())
+        .then(data => fillAuthors(data))
+        .catch(error => console.error('Error: ', error))
     }
 
-fetch('/getTweets')
-    .then(response => response.json())
-    .then(data => fillTable(data))
-    .catch(error => console.error('Error: ', error))
+    async function generateGraph() {
+        await google.charts.load('current', { packages: ['corechart'] });
+        var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Data');
+            data.addColumn('number', 'Polaridade');
 
-fetch('/getAuthors')
-    .then(response => response.json())
-    .then(data => fillAuthors(data))
-    .catch(error => console.error('Error: ', error))
+            var dados = [
+                ['2023-01', 0.8],
+                ['2023-02', 0.6],
+                ['2023-03', -0.2],
+                ['2023-04', 0.4],
+                ['2023-05', -0.5]
+            ];
 
-fetch('/getTags')
-    .then(response => response.json())
-    .then(data => fillTags(data))
-    .catch(error => console.error('Error: ', error))
+            data.addRows(dados);
+
+            var options = {
+                title: 'Polaridade por Data',
+                hAxis: {
+                    title: 'Data',
+                },
+                vAxis: {
+                    title: 'Polaridade',
+                    minValue: -1,
+                    maxValue: 1
+                }
+            };
+
+            var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+
+            // Configurar a função para mostrar informações no tooltip
+            const showInfo = (e) => {
+                var row = e.row;
+                var dataView = new google.visualization.DataView(data);
+                var dataItem = dataView.getValue(row, 0); // Obter o valor da primeira coluna (Data)
+
+                // Exibir informações no tooltip
+                var tooltipContent = '<div>Data: ' + dataItem + '</div>';
+                chart.setSelection([{ row: row }]); // Selecionar o ponto
+                chart.tooltip.triggerSelection(tooltipContent); // Exibir o tooltip personalizado
+            } 
+            google.visualization.events.addListener(chart, 'onmouseover', showInfo);
+            
+            chart.draw(data, options);
+        }
+
+        function clearPage() {
+            const authorsSection = document.getElementById('authors-section');
+            const generateGraphBtn = document.getElementById('generate-graph-btn');
+
+            authorsSection.style.display = 'none';
+            generateGraphBtn.style.display = 'none';
+        }
+
+    fetch('/getAuthors')
+        .then(response => response.json())
+        .then(data => fillAuthors(data))
+        .catch(error => console.error('Error: ', error))
+
+    fetch('/getTags')
+        .then(response => response.json())
+        .then(data => fillTags(data))
+        .catch(error => console.error('Error: ', error))
 </script>
-</body>
 </html>
