@@ -15,6 +15,9 @@ const Tweets = sequelize.define('tweets', {
         polarity: {
             type: Sequelize.FLOAT
         },
+        tweetdate: {
+            type: DataTypes.DATE, 
+        },
         createdat: {
             type: DataTypes.DATE, 
         }    
